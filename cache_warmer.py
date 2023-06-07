@@ -1,11 +1,18 @@
-from bs4 import BeautifulSoup, SoupStrainer
+"""Cache Warmer."""
 from time import perf_counter_ns
+
+from bs4 import BeautifulSoup, SoupStrainer
 from requests import get
 
-def main() -> None:
-    root = "https://www.life-baptist.org.uk"
 
-    response = get(root)
+def main() -> None:
+    """Download the root page, then downloads the linked pages."""
+    root = "https://www.life-baptist.org.uk"
+    headers = {
+        "User-Agent": "Cache-Warmer",
+    }
+
+    response = get(root, headers=headers)
     if response.status_code == 200:
         print(f"Parsing links for {root}")
         soup = BeautifulSoup(response.text, "html.parser", parse_only=SoupStrainer("a"))
@@ -16,7 +23,7 @@ def main() -> None:
         }
         for link in sorted(links):
             start = perf_counter_ns()
-            response = get(link)
+            response = get(link, headers=headers)
             elapsed = (perf_counter_ns() - start) // 1000000
             text = (
                 f"{link.replace(root,'')}"
@@ -32,6 +39,7 @@ def main() -> None:
             print(text)
     else:
         print(f"Unable to download {root}")
+
 
 if __name__ == "__main__":
     main()
