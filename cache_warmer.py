@@ -2,7 +2,7 @@
 from time import perf_counter_ns
 
 from bs4 import BeautifulSoup, SoupStrainer
-from requests import get
+from requests import get, head
 
 
 def main() -> None:
@@ -23,7 +23,7 @@ def main() -> None:
         }
         for link in sorted(links):
             start = perf_counter_ns()
-            response = get(link, headers=headers)
+            response = head(link, headers=headers)
             elapsed = (perf_counter_ns() - start) // 1000000
             text = (
                 f"{link.replace(root,'')}"
